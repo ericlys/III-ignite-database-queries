@@ -25,6 +25,26 @@ export class migration1616108470200 implements MigrationInterface {
     await queryRunner.query(
       'ALTER TABLE "users_games_games" ADD CONSTRAINT "FK_934b0d8f9d0084c97d3876ad32d" FOREIGN KEY ("gamesId") REFERENCES "games"("id") ON DELETE CASCADE ON UPDATE NO ACTION',
     );
+
+    await queryRunner.query(
+      'CREATE TABLE "genres" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "title" character varying NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_c9b16b62917b5595af363e98564" PRIMARY KEY ("id"))',
+    );
+    await queryRunner.query(
+      'CREATE TABLE "games_genres_genres" ("gamesId" uuid NOT NULL, "genresId" uuid NOT NULL, CONSTRAINT "PK_o34067d574477fd5c7693bc7872" PRIMARY KEY ("gamesId", "genresId"))',
+    );
+    await queryRunner.query(
+      'CREATE INDEX "IDX_l5263d029d8644de829aae5235" ON "games_genres_genres" ("gamesId") ',
+    );
+    await queryRunner.query(
+      'CREATE INDEX "IDX_k34b0d8f9d0081c97d3876ad32" ON "games_genres_genres" ("genresId") ',
+    );
+
+    await queryRunner.query(
+      'ALTER TABLE "games_genres_genres" ADD CONSTRAINT "FK_v5263d029d8644de829aae5c35a" FOREIGN KEY ("gamesId") REFERENCES "games"("id") ON DELETE CASCADE ON UPDATE NO ACTION',
+    );
+    await queryRunner.query(
+      'ALTER TABLE "games_genres_genres" ADD CONSTRAINT "FK_m34b0d8f9d0084c97d3876ad32d" FOREIGN KEY ("genresId") REFERENCES "genres"("id") ON DELETE CASCADE ON UPDATE NO ACTION',
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
@@ -34,10 +54,20 @@ export class migration1616108470200 implements MigrationInterface {
     await queryRunner.query(
       'ALTER TABLE "users_games_games" DROP CONSTRAINT "FK_e5263d029d8644de829aae5c35a"',
     );
+    await queryRunner.query(
+      'ALTER TABLE "games_genres_genres" DROP CONSTRAINT "FK_v5263d029d8644de829aae5c35a"',
+    );
+    await queryRunner.query(
+      'ALTER TABLE "games_genres_genres" DROP CONSTRAINT "FK_m34b0d8f9d0084c97d3876ad32d"',
+    );
     await queryRunner.query('DROP INDEX "IDX_934b0d8f9d0084c97d3876ad32"');
     await queryRunner.query('DROP INDEX "IDX_e5263d029d8644de829aae5c35"');
+    await queryRunner.query('DROP INDEX "IDX_l5263d029d8644de829aae5235"');
+    await queryRunner.query('DROP INDEX "IDX_k34b0d8f9d0081c97d3876ad32"');
     await queryRunner.query('DROP TABLE "users_games_games"');
+    await queryRunner.query('DROP TABLE "games_genres_genres"');
     await queryRunner.query('DROP TABLE "games"');
     await queryRunner.query('DROP TABLE "users"');
+    await queryRunner.query('DROP TABLE "genres"');
   }
 }
